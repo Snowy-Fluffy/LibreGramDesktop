@@ -60,11 +60,11 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "CompanyName", "Telegram FZ-LLC"
-            VALUE "FileDescription", "Telegram Desktop"
+            VALUE "CompanyName", "LibreGram Contributors"
+            VALUE "FileDescription", "LibreGram"
             VALUE "FileVersion", "7.0.6.0"
             VALUE "LegalCopyright", "Copyright (C) 2014-2026"
-            VALUE "ProductName", "Telegram Desktop"
+            VALUE "ProductName", "LibreGram"
             VALUE "ProductVersion", "7.0.6.0"
         END
     END

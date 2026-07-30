@@ -383,8 +383,8 @@ MainMenu::MainMenu(
 	parentResized();
 
 	_telegram->setMarkedText(tr::link(
-		u"Telegram Desktop"_q,
-		u"https://desktop.telegram.org"_q));
+		u"LibreGram"_q,
+		u"https://github.com/libregram/libregram"_q));
 	_telegram->setLinksTrusted();
 	_version->setMarkedText(
 		tr::link(
