@@ -55,6 +55,10 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "storage/storage_facade.h"
 #include "storage/storage_shared_media.h"
 
+// AyuGram includes
+#include "ayu/ui/ayu_userpic.h"
+
+
 namespace {
 
 constexpr auto kUpdateFullPeerTimeout = crl::time(5000); // Not more than once in 5 seconds.
@@ -514,6 +518,14 @@ QImage PeerData::GenerateUserpicImage(
 		Ui::PeerUserpicView &view,
 		int size,
 		std::optional<int> radius) {
+	if (!radius) {
+		const auto shape = peer->isForum()
+			? Ui::PeerUserpicShape::Forum
+			: Ui::PeerUserpicShape::Circle;
+		if (AyuUserpic::ShouldOverrideShape(shape)) {
+			radius = AyuUserpic::ComputeRadius(size);
+		}
+	}
 	if (const auto userpic = peer->userpicCloudImage(view)) {
 		auto image = userpic->scaled(
 			{ size, size },
@@ -1731,6 +1743,17 @@ void PeerData::processTopics(const MTPVector<MTPForumTopic> &topics) {
 	if (const auto forum = this->forum()) {
 		forum->applyReceivedTopics(topics);
 	}
+}
+
+bool PeerData::isAyuNoForwards() const {
+	if (const auto user = asUser()) {
+		return user->isAyuNoForwards();
+	} else if (const auto channel = asChannel()) {
+		return channel->isAyuNoForwards();
+	} else if (const auto chat = asChat()) {
+		return chat->isAyuNoForwards();
+	}
+	return true;
 }
 
 bool PeerData::allowsForwarding() const {
