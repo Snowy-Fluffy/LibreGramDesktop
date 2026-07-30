@@ -15,6 +15,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "data/data_peer_values.h"
 #include "apiwrap.h"
 
+#include "ayu/ayu_settings.h"
+
 namespace Api {
 namespace {
 
@@ -112,6 +114,15 @@ void SendProgressManager::send(const Key &key, int progress) {
 	if (skipRequest(key)) {
 		return;
 	}
+
+	// AyuGram sendUploadProgress
+	const auto &ghost = AyuSettings::ghost(_session);
+	if (!ghost.sendUploadProgress())
+	{
+		DEBUG_LOG(("[AyuGram] Don't send upload progress"));
+		return;
+	}
+
 	using Type = SendProgressType;
 	const auto action = [&]() -> MTPsendMessageAction {
 		const auto p = MTP_int(progress);
@@ -152,6 +163,7 @@ void SendProgressManager::send(const Key &key, int progress) {
 }
 
 bool SendProgressManager::skipRequest(const Key &key) const {
+	if (Main::Session::debugActions) return true;
 	const auto user = key.history->peer->asUser();
 	if (!user) {
 		return false;

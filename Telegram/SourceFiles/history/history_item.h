@@ -218,6 +218,8 @@ public:
 	void setRealShortcutId(BusinessShortcutId id);
 	void setCustomServiceLink(ClickHandlerPtr link);
 
+	[[nodiscard]] bool isAyuNoForwards() const;
+
 	void addLogEntryOriginal(
 		WebPageId localId,
 		const QString &label,
@@ -461,6 +463,13 @@ public:
 		MsgId replyToTop,
 		bool isForumPost);
 	void setPostAuthor(const QString &author);
+	void setDeleted();
+	[[nodiscard]] bool isDeleted() const;
+	[[nodiscard]] bool isBurnt() const;
+	[[nodiscard]] bool wasDeletedAnimated() const;
+	void markDeletedAnimated();
+	void applyTTL(TimeId destroyAt);
+	void setAyuHint(const QString &hint);
 	void setRealId(MsgId newId);
 	void markEphemeralSent();
 	void markTextAppearingStarted();
@@ -664,6 +673,11 @@ public:
 		return _ttlDestroyAt;
 	}
 
+	[[nodiscard]] int unsupportedTTL() const {
+		return _unsupportedTTL;
+	}
+	void removeTranslationBit();
+
 	[[nodiscard]] int boostsApplied() const {
 		return _boostsApplied;
 	}
@@ -769,8 +783,6 @@ private:
 	void applyTTL(const MTPDmessage &data);
 	void applyTTL(const MTPDmessageService &data);
 
-	void applyTTL(TimeId destroyAt);
-
 	// For an invoice button we replace the button text with a "Receipt" key.
 	// It should show the receipt for the payed invoice. Still let mobile apps do that.
 	void replaceBuyWithReceiptInMarkup();
@@ -811,6 +823,10 @@ private:
 	std::unique_ptr<Data::Media> _media;
 	std::unique_ptr<Data::MessageReactions> _reactions;
 	crl::time _reactionsLastRefreshed = 0;
+
+	bool _deleted = false;
+	bool _deletedAnimated = false;
+	int _unsupportedTTL = 0;
 
 	TimeId _date = 0;
 	TimeId _ttlDestroyAt = 0;
