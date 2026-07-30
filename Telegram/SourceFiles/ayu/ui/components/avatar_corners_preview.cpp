@@ -6,10 +6,8 @@
 // Copyright @Radolyn, 2026
 #include "ayu/ui/components/avatar_corners_preview.h"
 
-#include "apiwrap.h"
 #include "data/data_peer.h"
-#include "data/data_peer_id.h"
-#include "data/data_session.h"
+#include "data/data_user.h"
 #include "main/main_session.h"
 #include "styles/style_ayu_icons.h"
 #include "styles/style_dialogs.h"
@@ -19,7 +17,6 @@
 #include "ui/userpic_view.h"
 #include "ui/effects/ripple_animation.h"
 #include "window/window_session_controller.h"
-#include "window/window_session_controller_link_info.h"
 
 AvatarCornersPreview::AvatarCornersPreview(
 	QWidget *parent,
@@ -27,14 +24,14 @@ AvatarCornersPreview::AvatarCornersPreview(
 : RpWidget(parent)
 , _controller(controller)
 , _emptyUserpic(
-	Ui::EmptyUserpic::UserpicColor(
-		Data::DecideColorIndex(
-			peerFromChannel(ChannelId(2331068091)))),
-	u"AyuGram Releases"_q) {
+	Ui::EmptyUserpic::UserpicColor(0),
+	QString())
+, _peer(controller->session().user()) {
 	const auto &row = st::defaultDialogRow;
 	setFixedHeight(row.height);
 	setCursor(Qt::PointingHandCursor);
-	resolveChannel();
+	_peer->loadUserpic();
+	subscribeToUpdates();
 }
 
 void AvatarCornersPreview::paintEvent(QPaintEvent *e) {
@@ -63,14 +60,12 @@ void AvatarCornersPreview::paintEvent(QPaintEvent *e) {
 		_emptyUserpic.paintCircle(p, userpicX, userpicY, width(), photoSize);
 	}
 
-	const auto nameText = u"AyuGram Releases"_q;
+	const auto nameText = _peer
+		? _peer->name()
+		: QString();
 	p.setPen(st::dialogsNameFg);
 	p.setFont(st::semiboldFont);
 	p.drawText(row.nameLeft + xShift, row.nameTop + st::semiboldFont->ascent, nameText);
-
-	const auto nameWidth = st::semiboldFont->width(nameText);
-	const auto &badge = st::dialogsExteraOfficialIcon.icon;
-	badge.paint(p, row.nameLeft + xShift + nameWidth, row.nameTop, width());
 
 	p.setPen(st::dialogsTextFg);
 	p.setFont(st::dialogsTextFont);
@@ -94,39 +89,6 @@ void AvatarCornersPreview::mouseReleaseEvent(QMouseEvent *e) {
 	if (_ripple) {
 		_ripple->lastStop();
 	}
-	if (e->button() == Qt::LeftButton && rect().contains(e->pos())) {
-		_controller->showPeerByLink(Window::PeerByLinkInfo{
-			.usernameOrId = u"AyuGramReleases"_q,
-		});
-	}
-}
-
-void AvatarCornersPreview::resolveChannel() {
-	const auto session = &_controller->session();
-	_peer = session->data().peerByUsername(u"AyuGramReleases"_q);
-	if (_peer) {
-		_peer->loadUserpic();
-		subscribeToUpdates();
-		return;
-	}
-	const auto weak = base::make_weak(this);
-	session->api().request(MTPcontacts_ResolveUsername(
-		MTP_flags(0),
-		MTP_string(u"AyuGramReleases"_q),
-		MTP_string()
-	)).done([=](const MTPcontacts_ResolvedPeer &result) {
-		if (const auto strong = weak.get()) {
-			session->data().processUsers(result.data().vusers());
-			session->data().processChats(result.data().vchats());
-			strong->_peer = session->data().peerLoaded(
-				peerFromMTP(result.data().vpeer()));
-			if (strong->_peer) {
-				strong->_peer->loadUserpic();
-				strong->subscribeToUpdates();
-			}
-			strong->update();
-		}
-	}).send();
 }
 
 void AvatarCornersPreview::subscribeToUpdates() {

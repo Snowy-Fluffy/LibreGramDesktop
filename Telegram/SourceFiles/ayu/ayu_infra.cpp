@@ -73,7 +73,6 @@ void init() {
 	initUiSettings();
 	initIcon();
 	initWorker();
-	initRCManager();
 	initTranslator();
 }
 

@@ -32,7 +32,6 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *e) override;
 
 private:
-	void resolveChannel();
 	void subscribeToUpdates();
 
 	const not_null<Window::SessionController*> _controller;

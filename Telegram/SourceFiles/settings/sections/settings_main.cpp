@@ -86,6 +86,8 @@ https://github.com/telegramdesktop/tdesktop/blob/master/LEGAL
 #include "styles/style_menu_icons.h"
 #include "styles/style_settings.h"
 
+#include "ayu/ui/settings/settings_main.h"
+
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QWindow>
@@ -305,6 +307,16 @@ void BuildSectionButtons(SectionBuilder &builder) {
 	const auto session = builder.session();
 	const auto controller = builder.controller();
 	const auto showOther = builder.showOther();
+
+	builder.addSectionButton({
+		.title = tr::ayu_AyuPreferences(),
+		.targetSection = AyuMain::Id(),
+		.icon = { &st::menuIconPremium },
+		.keywords = { u"ayu"_q, u"libregram"_q },
+	});
+	builder.addSkip();
+	builder.addDivider();
+	builder.addSkip();
 
 	if (!session->supportMode()) {
 		builder.addSectionButton({
