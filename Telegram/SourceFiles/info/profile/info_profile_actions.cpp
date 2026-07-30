@@ -204,6 +204,8 @@ base::options::toggle ShowChannelJoinedBelowAbout({
 					.sessionWindow = weak,
 				}));
 			return;
+		} else if (addToLink.isEmpty()) {
+			link = "@" + peer->username();
 		} else if (!link.startsWith(u"https://"_q)) {
 			link = peer->session().createInternalLinkFull(peer->username())
 				+ addToLink;
@@ -1059,7 +1061,7 @@ auto AddMainButton(
 		const style::SettingsButton &st = st::infoMainButton) {
 	const auto button = AddActionButton(
 		parent,
-		std::move(text) | rpl::map(tr::upper),
+		std::move(text),
 		std::move(toggleOn),
 		std::move(callback),
 		nullptr,
@@ -1651,7 +1653,7 @@ Section DetailsFiller::makeInfo() {
 				user->session().supportHelper().infoTextValue(user));
 		}
 
-		{
+		if (!user->isSelf()) {
 			const auto phoneLabel = addInfoOneLine(
 				tr::lng_info_mobile_label(),
 				PhoneWithSpoilerValue(user, PhoneOrHiddenValue(user)),
@@ -1693,6 +1695,18 @@ Section DetailsFiller::makeInfo() {
 			}),
 			QString(),
 			st::infoProfileLabeledUsernamePadding);
+		if (Core::App().settings().birthDateEnabled()) {
+			addInfoOneLine(
+				tr::lng_libregram_info_registration(),
+				RegistrationValue(user),
+				tr::lng_context_copy_text(tr::now));
+		}
+		if (user->hasUserpic() && Core::App().settings().datacenterEnabled()) {
+			addInfoOneLine(
+				tr::lng_libregram_info_dc(),
+				DataCenterValue(_peer),
+				tr::lng_context_copy_text(tr::now));
+		}
 		const auto callback = UsernamesLinkCallback(
 			_peer,
 			controller,
@@ -1848,6 +1862,13 @@ Section DetailsFiller::makeInfo() {
 		if (!_topic) {
 			addTranslateToMenu(about.text, AboutWithAdvancedValue(_peer));
 			SetupAboutPeerIdDrag(about.text, _peer);
+		}
+
+		if (_peer->hasUserpic() && Core::App().settings().datacenterEnabled()) {
+			addInfoOneLine(
+				tr::lng_libregram_info_dc(),
+				DataCenterValue(_peer),
+				tr::lng_context_copy_text(tr::now));
 		}
 	}
 	raw->toggleOn(tracker.atLeastOneShownValue());
