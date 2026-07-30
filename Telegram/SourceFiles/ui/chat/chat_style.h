@@ -70,8 +70,6 @@ struct MessageStyle {
 	style::TextPalette fwdTextPalette;
 	style::TextPalette replyTextPalette;
 	style::Markdown richPageStyle;
-	style::icon tailLeft = { Qt::Uninitialized };
-	style::icon tailRight = { Qt::Uninitialized };
 	style::icon historyRepliesIcon = { Qt::Uninitialized };
 	style::icon historyViewsIcon = { Qt::Uninitialized };
 	style::icon historyPinIcon = { Qt::Uninitialized };

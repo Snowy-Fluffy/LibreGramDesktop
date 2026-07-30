@@ -845,7 +845,7 @@ void Generator::paintBubble(const Bubble &bubble) {
 		if (bubble.attachToBottom) {
 			rounding.bottomRight = Corner::Small;
 		} else if (bubble.tail) {
-			rounding.bottomRight = Corner::Tail;
+			rounding.bottomRight = Corner::Large;
 		}
 	} else {
 		if (bubble.attachToTop) {
@@ -854,7 +854,7 @@ void Generator::paintBubble(const Bubble &bubble) {
 		if (bubble.attachToBottom) {
 			rounding.bottomLeft = Corner::Small;
 		} else if (bubble.tail) {
-			rounding.bottomLeft = Corner::Tail;
+			rounding.bottomLeft = Corner::Large;
 		}
 	}
 	Ui::PaintBubble(*_p, Ui::SimpleBubble{
@@ -892,13 +892,6 @@ void Generator::paintBubble(const Bubble &bubble) {
 			const auto radius = st::messageTextStyle.blockquote.radius;
 			_p->setOpacity(Ui::kDefaultOutline1Opacity);
 			_p->setClipRect(rbar.x(), rbar.y(), outline, rbar.height());
-			_p->drawRoundedRect(rbar, radius, radius);
-			_p->setOpacity(Ui::kDefaultBgOpacity);
-			_p->setClipRect(
-				rbar.x() + outline,
-				rbar.y(),
-				rbar.width() - outline,
-				rbar.height());
 			_p->drawRoundedRect(rbar, radius, radius);
 		}
 		_p->setOpacity(1.);
