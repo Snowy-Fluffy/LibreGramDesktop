@@ -296,6 +296,39 @@ void BuildQoLToggles(SectionBuilder &builder, AyuSectionBuilder &ayu) {
 		.getter = &AyuSettings::voiceConfirmation,
 		.setter = &AyuSettings::setVoiceConfirmation,
 	});
+
+	ayu.addSectionDivider();
+
+	builder.addSubsectionTitle(rpl::single(QString("Profile info")));
+
+	const auto appSettings = &Core::App().settings();
+	ayu.addToggle({
+		.id = u"ayu/birthDateEnabled"_q,
+		.title = tr::lng_libregram_info_registration(),
+		.getter = [=] { return appSettings->birthDateEnabled(); },
+		.setter = [=](bool enabled) {
+			appSettings->setBirthDateEnabled(enabled);
+			Core::App().saveSettingsDelayed();
+		},
+	});
+	ayu.addToggle({
+		.id = u"ayu/datacenterEnabled"_q,
+		.title = tr::lng_libregram_info_dc(),
+		.getter = [=] { return appSettings->datacenterEnabled(); },
+		.setter = [=](bool enabled) {
+			appSettings->setDatacenterEnabled(enabled);
+			Core::App().saveSettingsDelayed();
+		},
+	});
+	ayu.addToggle({
+		.id = u"ayu/gameeEnabled"_q,
+		.title = tr::lng_settings_profile_photo_privacy(),
+		.getter = [=] { return appSettings->gameeEnabled(); },
+		.setter = [=](bool enabled) {
+			appSettings->setGameeEnabled(enabled);
+			Core::App().saveSettingsDelayed();
+		},
+	});
 }
 
 const auto kMeta = BuildHelper({
