@@ -33,7 +33,12 @@ function(generate_lang target_name lang_file src_loc)
     )
     generate_target(${target_name} lang ${gen_timestamp} "${gen_files}" ${gen_dst})
 
-    if (NOT CMAKE_GENERATOR MATCHES "Visual Studio|Xcode")
+    # Per-TU lang key subsetting is disabled: its scanner only recognizes
+    # identifiers prefixed "lng_" (upstream tdesktop's convention), so it
+    # silently drops every AyuGram "ayu_" key from every file's subset,
+    # breaking tr::ayu_* everywhere. Falling back to the full key set is
+    # the same supported path already used for Visual Studio/Xcode builds.
+    if (FALSE)
         file(GLOB_RECURSE lang_sources CONFIGURE_DEPENDS
             ${src_loc}/*.cpp
             ${src_loc}/*.h
