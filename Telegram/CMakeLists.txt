@@ -23,6 +23,12 @@ add_subdirectory(codegen)
 
 # AyuGram filters
 add_subdirectory(lib_icu)
+if (NOT MSVC)
+    # Vendored ICU snapshot calls its own deprecated ucnv_safeClone
+    # internally; newer GCC flags this and our build treats warnings
+    # as errors, so silence it for this third-party target only.
+    target_compile_options(icu_regex_minimal PRIVATE -Wno-error=deprecated-declarations)
+endif()
 # AyuGram filters
 
 get_filename_component(src_loc SourceFiles REALPATH)
