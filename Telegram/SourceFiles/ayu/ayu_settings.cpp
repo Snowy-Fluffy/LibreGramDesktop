@@ -18,6 +18,7 @@
 #include "main/main_session.h"
 #include "platform/platform_translate_provider.h"
 #include "rpl/combine.h"
+#include "settings.h"
 #include "window/window_controller.h"
 
 #include <fstream>
